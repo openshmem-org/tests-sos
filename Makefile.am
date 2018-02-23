@@ -17,4 +17,17 @@ EXTRA_DIST = README NEWS LICENSE
 
 SUBDIRS = test
 
-
+all:
+	@echo "==============================="
+	@echo "= Sandia OpenSHMEM Test Suite ="
+	@echo "==============================="
+	@echo
+	@echo "To build and run the test suite:"
+	@echo " $$ make check"
+	@echo
+	@echo "The following make variables can be used:"
+	@echo " TESTS       - Specify tests to be run (TESTS=\"\" runs no tests)"
+	@echo " NPROCS      - Specify number of processes"
+	@echo " TEST_RUNNER - Specify command used to run tests, e.g.,"
+	@echo "               'make check TEST_RUNNER=\"oshrun -np 4 -f hosts\"'"
+	@echo

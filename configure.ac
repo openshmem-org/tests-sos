@@ -13,16 +13,12 @@
 
 dnl Init Autoconf/Automake/Libtool
 
-AC_INIT([Sandia OpenSHMEM Tests], [1.4.0], [https://github.com/Sandia-OpenSHMEM/SOS])
+AC_INIT([Sandia OpenSHMEM Test Suite], [1.4.0], [https://github.com/Sandia-OpenSHMEM/SOS])
 AC_PREREQ([2.60])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
 
 AM_INIT_AUTOMAKE([foreign check-news color-tests parallel-tests dist-bzip2 no-define subdir-objects tar-ustar 1.11 -Wall -Werror])
-
-m4_ifndef([AS_VAR_COPY],
-    [m4_define([AS_VAR_COPY],
-       [AS_LITERAL_IF([$1[]$2], [$1=$$2], [eval $1=\$$2])])])
 
 dnl Work around change in how the rules were implemented between
 dnl 1.11.2 and 1.11.3.
@@ -34,21 +30,17 @@ AS_IF([test -z "$AM_V"],
    AC_SUBST([AM_DEFAULT_V])])
 
 dnl information on the package
-AC_CONFIG_HEADERS([config.h])
-
-AC_CANONICAL_HOST
-
 AC_ARG_ENABLE([picky],
     [AC_HELP_STRING([--enable-picky],
                     [Enable developer-level compiler pickyness when building (default: disabled)])])
 
 AC_ARG_ENABLE([debug],
     [AC_HELP_STRING([--enable-debug],
-                    [Include debugging symbols in the build (default: disabled)])])
+                    [Include debugging symbols (default: disabled)])])
 
 AC_ARG_ENABLE([threads],
     [AC_HELP_STRING([--disable-threads],
-                    [Disable threading support (default:enabled)])])
+                    [Disable multithreaded tests (default:enabled)])])
 
 AS_IF([test "$enable_threads" != "no"], [
        OPAL_CONFIG_POSIX_THREADS(HAVE_POSIX_THREADS=1, HAVE_POSIX_THREADS=0)
@@ -60,13 +52,12 @@ AS_IF([test "$enable_threads" != "no"], [
        else
            AC_MSG_RESULT([no])
        fi
-       AC_DEFINE([ENABLE_THREADS], [1], [Enable threads])
        ])
 AM_CONDITIONAL([HAVE_PTHREADS], [test "$HAVE_POSIX_THREADS" = "1"])
 
 AC_ARG_ENABLE([openmp],
     [AC_HELP_STRING([--disable-openmp],
-                    [Disable OpenMP support (default: enabled)])])
+                    [Disable tests that use OpenMP (default: enabled)])])
 
 AS_IF([test "$enable_threads" != "no"], [
        AS_IF([test "$enable_openmp" != "no"], [
@@ -83,35 +74,25 @@ AM_CONDITIONAL([ENABLE_LENGTHY_TESTS], [test "$enable_lengthy_tests" = "yes"])
 
 AC_ARG_ENABLE([fortran],
     [AC_HELP_STRING([--disable-fortran],
-                    [Disable building the Fortran bindings (default: enabled)])])
+                    [Disable Fortran tests (default: enabled)])])
 
 AC_ARG_ENABLE([cxx],
     [AC_HELP_STRING([--disable-cxx],
-                    [Disable building the C++ bindings (default: enabled)])])
-
-AC_ARG_ENABLE([libtool-wrapper],
-  [AS_HELP_STRING([--disable-libtool-wrapper],
-    [Disable use of libtool executable wrappers for tests (default: enabled)])])
-AS_IF([test "$enable_libtool_wrapper" = "no"], [LIBTOOL_WRAPPER_LDFLAGS="-no-install"], [LIBTOOL_WRAPPER_LDFLAGS=])
-AC_SUBST([LIBTOOL_WRAPPER_LDFLAGS])
+                    [Disable C++ tests (default: enabled)])])
 
 AC_ARG_ENABLE([profiling],
     [AC_HELP_STRING([--enable-profiling],
-                    [Enable profiling (pshmem) interface (default:disabled)])])
-AS_IF([test "$enable_profiling" = "yes"],
-      [AC_DEFINE([ENABLE_PROFILING], [1], [Enable profiling (pshmem) interface])]
-      ])
+                    [Enable profiling (pshmem) interface tests (default:disabled)])])
+
+AC_ARG_ENABLE([shmemx-tests],
+    [AC_HELP_STRING([--enable-shmemx-tests],
+                    [Enable SHMEM extensions tests (default:disabled)])])
+AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx_tests" = "yes"])
 
 AC_ARG_ENABLE([long-fortran-header],
     [AC_HELP_STRING([--enable-long-fortran-header],
                     [Enable long Fortran header, including all function declarations (default:disabled)])])
-AS_IF([test "$enable_long_fortran_header" = "yes"], [FORTRAN_LONG_HEADER=" "], [FORTRAN_LONG_HEADER="!"])
-AC_SUBST([FORTRAN_LONG_HEADER])
 AM_CONDITIONAL([HAVE_LONG_FORTRAN_HEADER], [test "$enable_long_fortran_header" = "yes"])
-
-AC_ARG_WITH([oshrun-launcher],
-    [AC_HELP_STRING([--with-oshrun-launcher],
-                    [Set launcher to be used by oshrun launcher wrapper. (default: auto)])])
 
 dnl check for programs
 
@@ -119,8 +100,6 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_C_INLINE
 AC_PROG_CXX dnl required even with --disable-cxx due to automake conditionals
-m4_ifdef([AM_PROG_AR],[AM_PROG_AR])
-AC_PATH_PROG([PERL],[perl])
 
 if test "$enable_fortran" != "no" ; then
   AC_PROG_FC
@@ -129,6 +108,63 @@ else
 fi
 if test "$FC" != "" ; then
   AC_FC_WRAPPERS
+fi
+
+dnl check that c/c++/fortran compilers can compile SHMEM code
+AC_MSG_CHECKING([C compiler can compile SHMEM code])
+AC_LANG_PUSH([C])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                   #include <shmem.h>
+                   long data;
+                   ]], [[
+                        shmem_init();
+                        shmem_long_p(&data, 0, 0);
+                        shmem_finalize();
+                        ]]
+                   )],
+                   [AC_MSG_RESULT([yes])],
+                   [AC_MSG_RESULT([no])
+                    AC_MSG_ERROR([C compiler cannot compile SHMEM code])])
+AC_LANG_POP([C])
+
+if test "$enable_cxx" != "no" ; then
+    AC_MSG_CHECKING([C++ compiler can compile SHMEM code])
+    AC_LANG_PUSH([C++])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                       #include <shmem.h>
+                       long data;
+                       ]], [[
+                            shmem_init();
+                            shmem_long_p(&data, 0, 0);
+                            shmem_finalize();
+                            ]]
+                       )],
+                       [AC_MSG_RESULT([yes])],
+                       [AC_MSG_RESULT([no])
+                       AC_MSG_ERROR([C++ compiler cannot compile SHMEM code])])
+    AC_LANG_POP([C++])
+fi
+
+if test "$FC" != "" ; then
+    AC_MSG_CHECKING([Fortran compiler can compile SHMEM code])
+    AC_LANG_PUSH([Fortran])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[
+                            include 'shmem.fh'
+
+                            integer npes, me
+
+                            call shmem_init()
+                            npes = num_pes()
+                            me = my_pe()
+
+                            print *,'I am ', me, ' of ', npes
+                            call shmem_finalize()
+                            ]]
+                       )],
+                       [AC_MSG_RESULT([yes])],
+                       [AC_MSG_RESULT([no])
+                       AC_MSG_ERROR([Fortran compiler cannot compile SHMEM code])])
+    AC_LANG_POP([Fortran])
 fi
 
 if test "$enable_picky" = "yes" -a "$GCC" = "yes" ; then
@@ -141,27 +177,9 @@ if test "$enable_debug" = "yes" ; then
   CFLAGS="$CFLAGS -g"
 fi
 
-AC_CACHE_SAVE
-
-AC_SEARCH_LIBS([clock_gettime], [rt],
-               [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [define if clock_gettime is available]) ])
-
-dnl check for libraries
-
 AM_CONDITIONAL([HAVE_FORTRAN], [test "$FC" != ""])
 AM_CONDITIONAL([HAVE_CXX], [test "$enable_cxx" != "no" ])
 AM_CONDITIONAL([ENABLE_PROFILING], [test "$enable_profiling" = "yes" ])
-
-dnl check for compiler characteristics
-
-# disable aslr, if possible at link time
-aslr_LDFLAGS=
-case $host_os in
-darwin*)
-    aslr_LDFLAGS="-Wl,-no_pie"
-    ;;
-esac
-AC_SUBST(aslr_LDFLAGS)
 
 dnl make tests work in standalone mode
 AM_CONDITIONAL([USE_PMI_SIMPLE], [false])
@@ -171,9 +189,6 @@ AM_CONDITIONAL([EXTERNAL_TESTS], [true])
 dnl final output
 
 LT_INIT
-
-# Need the libtool binary before setting up rpath
-
 LT_OUTPUT
 
 AC_CONFIG_FILES([Makefile

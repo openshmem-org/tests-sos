@@ -1,0 +1,36 @@
+========================================================================
+Sandia OpenSHEM Test Suite
+========================================================================
+
+** About
+
+This package contains the Sandia OpenSHMEM test suite and performance
+test suite.  For the most recent versions of these tests or to propose
+changes, please refer to the Sandia OpenSHMEM repository at
+https://github.com/Sandia-OpenSHMEM/SOS.
+
+** Building
+
+The Sandia OpenSHMEM test suite utilizes the GNU Autotools build
+system.  The standard GNU configure script and make system is used, as
+follows:
+
+  $ ./autogen.sh
+  $ mkdir build
+  $ cd build
+  $ ../configure <options> CC=oshcc CXX=oshc++ FC=oshfort
+  $ make check
+
+Several make variables can be used to modify the behvior of make check:
+
+NPROCS
+    Set the number of processes used to run each test.
+    Example: "make check NPROCS=4"
+
+TEST_RUNNER
+    Specify the command used to run each test.  Example:
+    "make check TEST_RUNNER='oshrun -np 2 -hosts compute1,compute2'"
+
+TESTS
+    Specify which tests to run.  For example, "make check TESTS="
+    builds the tests without running them.
