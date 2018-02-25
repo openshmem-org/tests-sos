@@ -19,6 +19,7 @@ follows:
   $ mkdir build
   $ cd build
   $ ../configure <options> CC=oshcc CXX=oshc++ FC=oshfort
+  $ make
   $ make check
 
 Several make variables can be used to modify the behvior of make check:
