@@ -4,9 +4,9 @@ Sandia OpenSHEM Test Suite
 
 ** About
 
-This package contains the Sandia OpenSHMEM test suite and performance
-test suite.  For the most recent versions of these tests or to propose
-changes, please refer to the Sandia OpenSHMEM repository at
+This package contains the Sandia OpenSHMEM unit tests and performance
+test suite.  For the most recent versions of these tests or to submit
+bugfixes, please refer to the Sandia OpenSHMEM repository at
 https://github.com/Sandia-OpenSHMEM/SOS.
 
 ** Building

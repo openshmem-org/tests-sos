@@ -38,6 +38,17 @@ AC_ARG_ENABLE([debug],
     [AC_HELP_STRING([--enable-debug],
                     [Include debugging symbols (default: disabled)])])
 
+AC_ARG_WITH([test-runner],
+    [AC_HELP_STRING([--with-test-runner],
+                    [Command used to run tests (default: 'oshrun -np $(NPROCS)')])])
+
+if test -n "$with_test_runner" ; then
+    TEST_RUNNER="$with_test_runner"
+else
+    TEST_RUNNER='oshrun -np $(NPROCS)'
+fi
+AC_SUBST(TEST_RUNNER)
+
 AC_ARG_ENABLE([threads],
     [AC_HELP_STRING([--disable-threads],
                     [Disable multithreaded tests (default:enabled)])])
@@ -54,10 +65,6 @@ AS_IF([test "$enable_threads" != "no"], [
        fi
        ])
 AM_CONDITIONAL([HAVE_PTHREADS], [test "$HAVE_POSIX_THREADS" = "1"])
-
-AC_ARG_ENABLE([openmp],
-    [AC_HELP_STRING([--disable-openmp],
-                    [Disable tests that use OpenMP (default: enabled)])])
 
 AS_IF([test "$enable_threads" != "no"], [
        AS_IF([test "$enable_openmp" != "no"], [
@@ -84,18 +91,12 @@ AC_ARG_ENABLE([profiling],
     [AC_HELP_STRING([--enable-profiling],
                     [Enable profiling (pshmem) interface tests (default:disabled)])])
 
-AC_ARG_ENABLE([shmemx-tests],
-    [AC_HELP_STRING([--enable-shmemx-tests],
+AC_ARG_ENABLE([shmemx],
+    [AC_HELP_STRING([--enable-shmemx],
                     [Enable SHMEM extensions tests (default:disabled)])])
-AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx_tests" = "yes"])
-
-AC_ARG_ENABLE([long-fortran-header],
-    [AC_HELP_STRING([--enable-long-fortran-header],
-                    [Enable long Fortran header, including all function declarations (default:disabled)])])
-AM_CONDITIONAL([HAVE_LONG_FORTRAN_HEADER], [test "$enable_long_fortran_header" = "yes"])
+AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx" = "yes"])
 
 dnl check for programs
-
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_C_INLINE
@@ -184,10 +185,10 @@ AM_CONDITIONAL([ENABLE_PROFILING], [test "$enable_profiling" = "yes" ])
 dnl make tests work in standalone mode
 AM_CONDITIONAL([USE_PMI_SIMPLE], [false])
 AM_CONDITIONAL([USE_PORTALS4], [false])
+AM_CONDITIONAL([HAVE_LONG_FORTRAN_HEADER], [false])
 AM_CONDITIONAL([EXTERNAL_TESTS], [true])
 
 dnl final output
-
 LT_INIT
 LT_OUTPUT
 
