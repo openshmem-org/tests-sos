@@ -36,9 +36,8 @@ script:
     - cd $SOS_SRC
     - mkdir build
     - cd build
-    # FIXME: Fortran tests temporarily disabled because of compilation issues
-    # in Travis environment.  With gcc 4.8 in Ubuntu Trusty, pthreads configury
-    # doesn't seem to detect the need for -lpthread.
-    - ../configure CC=oshcc CXX=oshc++ FC=oshfort CFLAGS="-std=gnu99" FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread" --disable-fortran
+      # Note: With gcc 4.8 in Ubuntu Trusty, pthreads configury doesn't seem to
+      # detect the need for -lpthread.
+    - ../configure CC=oshcc CXX=oshc++ FC=oshfort CFLAGS="-std=gnu99" FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread"
     - make $TRAVIS_PAR_MAKE
     - make check
