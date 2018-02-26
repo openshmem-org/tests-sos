@@ -1,0 +1,46 @@
+dist: trusty
+language: c
+dist: trusty
+compiler:
+    - gcc
+env:
+    global:
+        - TRAVIS_PAR_MAKE="-j 4"
+        - FI_LOG_LEVEL=warn
+        - SHMEM_INFO=1
+os:
+    - linux
+
+addons:
+    apt:
+        packages:
+            - gfortran
+
+before_install:
+    - mkdir $HOME/travis
+    - mkdir $HOME/travis/build
+    - mkdir $HOME/travis/install
+    - export SOS_SRC=$PWD
+    - cd $HOME/travis
+    - wget https://raw.githubusercontent.com/Sandia-OpenSHMEM/SOS/master/scripts/simple-build-ofi.sh
+    - chmod +x simple-build-ofi.sh
+    - export SOS_VERSION="master"
+    - ./simple-build-ofi.sh $HOME/travis/build $HOME/travis/install
+
+install:
+    - cd $SOS_SRC
+    - ./autogen.sh
+
+script:
+    - export PATH=$HOME/travis/install/bin:$PATH
+    - cd $SOS_SRC
+    - mkdir build
+    - cd build
+    - oshcc -showme
+    - oshc++ -showme
+    - oshfort -showme
+    # FIXME: Fortran and threads tests temporarily disabled because of
+    # compilation issues in Travis environment
+    - ../configure CC=oshcc CXX=oshc++ FC=oshfort CFLAGS="-std=gnu99" FCFLAGS="-fcray-pointer" --disable-fortran --disable-threads
+    - make $TRAVIS_PAR_MAKE
+    - make check
