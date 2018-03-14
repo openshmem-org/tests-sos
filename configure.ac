@@ -168,10 +168,12 @@ if test "$FC" != "" ; then
     AC_LANG_POP([Fortran])
 fi
 
-if test "$enable_picky" = "yes" -a "$GCC" = "yes" ; then
-  CFLAGS="$CFLAGS -Wall -Wno-long-long -Wmissing-prototypes -Wstrict-prototypes -Wcomment -pedantic"
-else
-  CFLAGS="$CFLAGS -Wall"
+if test "$enable_picky" = "yes" ; then
+  if test "$GCC" = "yes" ; then
+    CFLAGS="$CFLAGS -Wall -Wno-long-long -Wmissing-prototypes -Wstrict-prototypes -Wcomment -pedantic"
+  else
+    CFLAGS="$CFLAGS -Wall"
+  fi
 fi
 
 if test "$enable_debug" = "yes" ; then
