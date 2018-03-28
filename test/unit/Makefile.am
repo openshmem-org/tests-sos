@@ -60,6 +60,7 @@ check_PROGRAMS = \
 	bcast_flood \
 	lfinc \
 	shmem_info \
+	query_thread \
 	global_exit \
 	asym_alloc \
 	set_fetch \
@@ -100,13 +101,7 @@ check_PROGRAMS = \
 
 if ENABLE_PROFILING
 check_PROGRAMS += \
-	pcontrol \
 	rma_coverage_pshmem
-endif
-
-if USE_PORTALS4
-check_PROGRAMS += \
-	 shmem_ct
 endif
 
 if HAVE_CXX
@@ -148,12 +143,8 @@ check_PROGRAMS += \
     mt_membar \
     threading \
     web \
-    thread_wait
-
-if SHMEMX_TESTS
-check_PROGRAMS += \
-    gettid_register
-endif
+    thread_wait \
+    query_thread_funneled 
 endif
 
 if HAVE_OPENMP
@@ -187,35 +178,32 @@ endif
 rma_coverage_pshmem_SOURCES = rma_coverage.c
 rma_coverage_pshmem_CFLAGS = -DTEST_PSHMEM
 
+query_thread_funneled_SOURCES = query_thread.c
+query_thread_funneled_CFLAGS = -DENABLE_THREADS
+
 mt_a2a_SOURCES = mt_a2a.c pthread_barrier.h
-mt_a2a_LDFLAGS = $(PTHREAD_LIBS)
+mt_a2a_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
 mt_a2a_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
 mt_a2a_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
 
-mt_contention_LDFLAGS = $(PTHREAD_LIBS)
-mt_contention_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
+mt_contention_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
+mt_contention_CFLAGS = $(PTHREAD_CFLAGS)
 mt_contention_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
-
-if SHMEMX_TESTS
-gettid_register_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
-gettid_register_CFLAGS = $(PTHREAD_CFLAGS)
-gettid_register_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
-endif
 
 mt_membar_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
 mt_membar_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
 mt_membar_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
 
-threading_LDFLAGS = $(PTHREAD_LIBS)
+threading_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
 threading_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
 threading_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
 
-web_LDFLAGS = $(PTHREAD_LIBS)
-web_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
+web_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
+web_CFLAGS = $(PTHREAD_CFLAGS)
 web_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
 
-thread_wait_LDFLAGS = $(PTHREAD_LIBS)
-thread_wait_CFLAGS = -I$(top_srcdir)/test/unit $(PTHREAD_CFLAGS)
+thread_wait_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
+thread_wait_CFLAGS = $(PTHREAD_CFLAGS)
 thread_wait_LDADD = $(LDADD) $(PTHREAD_CFLAGS)
 
 shmem_ctx_CFLAGS = $(AM_OPENMP_CFLAGS)
