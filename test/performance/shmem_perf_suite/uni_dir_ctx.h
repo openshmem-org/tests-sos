@@ -25,26 +25,22 @@
 * SOFTWARE.
 */
 
-
-void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
-        int streaming_node)
+static inline 
+void uni_bw_ctx(int len, perf_metrics_t *metric_info, int streaming_node)
 {
     double start = 0.0, end = 0.0;
-    int j = 0;
-    int dest = partner_node(*metric_info);
-    char *src = aligned_buffer_alloc(metric_info->nthreads * len);
-    char *dst = aligned_buffer_alloc(metric_info->nthreads * len);
-    assert(src && dst);
+    unsigned long int i, j;
+    int dest = partner_node(metric_info);
     static int check_once = 0;
 
     if (!check_once) {
         /* check to see whether sender and receiver are the same process */
         if (dest == metric_info->my_node) {
-            fprintf(stderr, "Warning: Sender and receiver are the same process (%d)\n", 
-                             dest);
+            fprintf(stderr, "Warning: Sender and receiver are the same "
+                            "process (%d)\n", dest);
         }
         /* hostname validation for all sender and receiver processes */
-        int status = check_hostname_validation(*metric_info);
+        int status = check_hostname_validation(metric_info);
         if (status != 0) return;
         check_once++;
     }
@@ -52,10 +48,9 @@ void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
     shmem_barrier_all();
 
     if (streaming_node) {
-#pragma omp parallel default(none) firstprivate(len, dest) private(j) \
-	shared(metric_info, src, dst, start, end) num_threads(metric_info->nthreads)
+#pragma omp parallel default(none) firstprivate(len, dest) private(i, j) \
+shared(metric_info, start, end) num_threads(metric_info->nthreads)
         {
-            int i;
             const int thread_id = omp_get_thread_num();
             shmem_ctx_t ctx;
             shmem_ctx_create(SHMEM_CTX_PRIVATE, &ctx);
@@ -63,9 +58,11 @@ void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
             for (i = 0; i < metric_info->warmup; i++) {
                 for (j = 0; j < metric_info->window_size; j++) {
 #ifdef USE_NONBLOCKING_API
-                    shmem_ctx_putmem_nbi(ctx, dst + thread_id * len, src + thread_id * len, len, dest);
+                    shmem_ctx_putmem_nbi(ctx, metric_info->dest + thread_id * len, 
+                                         metric_info->src + thread_id * len, len, dest);
 #else
-                    shmem_ctx_putmem(ctx, dst + thread_id * len, src + thread_id * len, len, dest);
+                    shmem_ctx_putmem(ctx, metric_info->dest + thread_id * len, 
+                                     metric_info->src + thread_id * len, len, dest);
 #endif
                 }
                 shmem_ctx_quiet(ctx);
@@ -76,10 +73,9 @@ void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
 
     shmem_barrier_all();
     if (streaming_node) {
-#pragma omp parallel default(none) firstprivate(len, dest) private(j) \
-        shared(metric_info, src, dst, start, end) num_threads(metric_info->nthreads)
+#pragma omp parallel default(none) firstprivate(len, dest) private(i, j) \
+shared(metric_info, start, end) num_threads(metric_info->nthreads)
         {
-            int i;
             const int thread_id = omp_get_thread_num();
             shmem_ctx_t ctx;
             shmem_ctx_create(SHMEM_CTX_PRIVATE, &ctx);
@@ -93,9 +89,11 @@ void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
             for (i = 0; i < metric_info->trials; i++) {
                 for (j = 0; j < metric_info->window_size; j++) {
 #ifdef USE_NONBLOCKING_API
-                    shmem_ctx_putmem_nbi(ctx, dst + thread_id * len, src + thread_id * len, len, dest);
+                    shmem_ctx_putmem_nbi(ctx, metric_info->dest + thread_id * len, 
+                                         metric_info->src + thread_id * len, len, dest);
 #else
-                    shmem_ctx_putmem(ctx, dst + thread_id * len, src + thread_id * len, len, dest);
+                    shmem_ctx_putmem(ctx, metric_info->dest + thread_id * len, 
+                                     metric_info->src + thread_id * len, len, dest);
 #endif
                 }
                 shmem_ctx_quiet(ctx);
@@ -107,12 +105,8 @@ void static inline uni_bw_ctx(int len, perf_metrics_t *metric_info,
     shmem_barrier_all();
     if (streaming_node) {
         end = perf_shmemx_wtime();
-        calc_and_print_results(end, start, len, *metric_info);
+        calc_and_print_results(end, start, len, metric_info);
     }
 
     shmem_barrier_all();
-
-    aligned_buffer_free(src);
-    aligned_buffer_free(dst);
-
 }
