@@ -76,7 +76,7 @@ AM_CONDITIONAL([HAVE_OPENMP], [test "$enable_threads" != "no" -a "$enable_openmp
 
 AC_ARG_ENABLE([lengthy-tests],
     [AC_HELP_STRING([--enable-lengthy-tests],
-                    [Enable long running tests in the test suite (default: disabled)])])
+                    [Execute long running tests as part of "make check" (default: disabled)])])
 AM_CONDITIONAL([ENABLE_LENGTHY_TESTS], [test "$enable_lengthy_tests" = "yes"])
 
 AC_ARG_ENABLE([fortran],
@@ -185,6 +185,7 @@ AM_CONDITIONAL([HAVE_CXX], [test "$enable_cxx" != "no" ])
 AM_CONDITIONAL([ENABLE_PROFILING], [test "$enable_profiling" = "yes" ])
 
 dnl make tests work in standalone mode
+AM_CONDITIONAL([USE_PMI_MPI], [false])
 AM_CONDITIONAL([USE_PMI_SIMPLE], [false])
 AM_CONDITIONAL([USE_PORTALS4], [false])
 AM_CONDITIONAL([HAVE_LONG_FORTRAN_HEADER], [false])
