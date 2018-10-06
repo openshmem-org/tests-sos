@@ -33,7 +33,6 @@
 **
 **  -by default megabytes/second results
 **
-**NOTE: this test assumes correctness of reduction algorithm
 */
 
 #include <bw_common.h>
@@ -41,13 +40,13 @@
 
 int main(int argc, char *argv[])
 {
-    bi_dir_bw_main(argc,argv);
+    bi_dir_bw_main(argc, argv, STYLE_GET);
 
     return 0;
 }  /* end of main() */
 
 void
-bi_dir_bw(int len, perf_metrics_t *metric_info)
+bi_dir_bw(int len, perf_metrics_t * const metric_info)
 {
     bi_bw_get(len, metric_info);
 }

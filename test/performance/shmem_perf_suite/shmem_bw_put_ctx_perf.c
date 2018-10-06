@@ -31,7 +31,6 @@
 **
 **  -by default megabytes/second results
 **
-**NOTE: this test assumes correctness of reduction algorithm
 */
 
 #define ENABLE_OPENMP
@@ -47,7 +46,7 @@ int main(int argc, char *argv[])
 }
 
 void
-uni_dir_bw(int len, perf_metrics_t *metric_info)
+uni_dir_bw(int len, perf_metrics_t * const metric_info)
 {
-    uni_bw_ctx(len, metric_info, !streaming_node(*metric_info));
+    uni_bw_ctx(len, metric_info, streaming_node(metric_info));
 }
