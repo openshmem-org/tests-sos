@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Intel Corporation. All rights reserved.
+ *  Copyright (c) 2019 Intel Corporation. All rights reserved.
  *  This software is available to you under the BSD license below:
  *
  *      Redistribution and use in source and binary forms, with or
@@ -23,35 +23,48 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * This test is derived from an example provided in the OpenSHMEM 1.4
- * specification.  Additional copyrights may apply.
- *
  */
 
+#include <stdio.h>
 #include <shmem.h>
 #include <shmemx.h>
 
+
 int main(void)
 {
+    int i, me, npes;
+    int ret = 0, errors = 0;
+
     shmem_init();
-    int mype = shmem_my_pe();
-    int npes = shmem_n_pes();
 
-    int *flags = shmem_calloc(npes, sizeof(int));
-    int *status = NULL;
+    me = shmem_my_pe();
+    npes = shmem_n_pes();
 
-    for (int i = 0; i < npes; i++)
-        shmem_int_p(&flags[mype], 1, i);
+    if (me == 0)
+        printf("Reuse teams test\n");
 
-    while (!shmemx_int_test_all(flags, npes, status, SHMEM_CMP_EQ, 1));
+    shmemx_team_t old_team, new_team;
+    ret = shmemx_team_split_strided(SHMEMX_TEAM_WORLD, 0, 1, npes, NULL, 0, &old_team);
+    if (ret) ++errors;
 
-    /* Check the flags array */
-    for (int i = 0; i < npes; i++) {
-        if (flags[i] != 1)
-            shmem_global_exit(1);
+    /* A total of npes-1 iterations are performed, where the active set in iteration i
+     * includes PEs i..npes-1.  The size of the team decreases by 1 each iteration.  */
+    for (i = 1; i < npes; i++) {
+
+        if (me == i) {
+            printf("%3d: creating new team (start, stride, size): %3d, %3d, %3d\n", me,
+                shmemx_team_translate_pe(old_team, 1, SHMEMX_TEAM_WORLD), 1, shmemx_team_n_pes(old_team)-1);
+        }
+
+        ret = shmemx_team_split_strided(old_team, 1, 1, shmemx_team_n_pes(old_team)-1, NULL, 0, &new_team);
+        if (old_team != SHMEMX_TEAM_INVALID && ret) ++errors;
+
+        shmemx_team_destroy(old_team);
+        old_team = new_team;
     }
-    shmem_free(flags);
+
+    shmemx_team_destroy(old_team);
     shmem_finalize();
-    return 0;
+
+    return errors != 0;
 }
