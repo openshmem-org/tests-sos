@@ -42,15 +42,16 @@ int main(void)
     int *status = NULL;
 
     for (int i = 0; i < npes; i++)
-        shmem_int_p(&flags[mype], 1, i);
+        shmem_int_atomic_set(&flags[mype], 1, i);
 
-    while (!shmemx_int_test_all(flags, npes, status, SHMEM_CMP_EQ, 1));
+    shmemx_int_wait_until_all(flags, npes, status, SHMEM_CMP_EQ, 1);
 
     /* Check the flags array */
     for (int i = 0; i < npes; i++) {
         if (flags[i] != 1)
             shmem_global_exit(1);
     }
+
     shmem_free(flags);
     shmem_finalize();
     return 0;

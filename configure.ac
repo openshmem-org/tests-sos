@@ -203,7 +203,8 @@ AC_CONFIG_FILES([Makefile
   test/performance/Makefile
   test/performance/shmem_perf_suite/Makefile
   test/performance/tests/Makefile
-  test/apps/Makefile])
+  test/apps/Makefile
+  test/spec-example/Makefile])
 
 AC_OUTPUT
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Intel Corporation. All rights reserved.
+ *  Copyright (c) 2019 Intel Corporation. All rights reserved.
  *  This software is available to you under the BSD license below:
  *
  *      Redistribution and use in source and binary forms, with or
@@ -23,35 +23,52 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * This test is derived from an example provided in the OpenSHMEM 1.4
- * specification.  Additional copyrights may apply.
- *
  */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <shmem.h>
 #include <shmemx.h>
 
+
 int main(void)
 {
+    static long lock = 0;
+
     shmem_init();
-    int mype = shmem_my_pe();
+    int me = shmem_my_pe();
     int npes = shmem_n_pes();
 
-    int *flags = shmem_calloc(npes, sizeof(int));
-    int *status = NULL;
+    int team_shared_npes = shmemx_team_n_pes(SHMEMX_TEAM_SHARED);
 
-    for (int i = 0; i < npes; i++)
-        shmem_int_p(&flags[mype], 1, i);
+    int *peers = malloc(team_shared_npes * sizeof(int));
+    int num_peers = 0;
 
-    while (!shmemx_int_test_all(flags, npes, status, SHMEM_CMP_EQ, 1));
+    /* Print the team members on SHMEMX_TEAM_SHARED */
+    /* Use a lock for cleaner output */
+    shmem_set_lock(&lock);
 
-    /* Check the flags array */
+    printf("[PE: %d] SHMEM_TEAM_SHARED peers: { ", me);
     for (int i = 0; i < npes; i++) {
-        if (flags[i] != 1)
-            shmem_global_exit(1);
+        if (shmemx_team_translate_pe(SHMEMX_TEAM_WORLD, i,
+                                     SHMEMX_TEAM_SHARED) != -1) {
+            peers[num_peers++] = i;
+            printf("%d ", i);
+        }
     }
-    shmem_free(flags);
+
+    printf("} (num_peers: %d)\n", num_peers);
+
+    fflush(NULL);
+
+    shmem_clear_lock(&lock);
+
+    if (num_peers != team_shared_npes) {
+        shmem_global_exit(1);
+    }
+
+    free(peers);
     shmem_finalize();
     return 0;
 }
+  
