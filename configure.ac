@@ -87,6 +87,10 @@ AC_ARG_ENABLE([cxx],
     [AC_HELP_STRING([--disable-cxx],
                     [Disable C++ tests (default: enabled)])])
 
+AC_ARG_ENABLE([c11-checks],
+    [AC_HELP_STRING([--disable-c11-checks],
+                    [Disable build-time type checks for C11 bindings (default: enabled)])])
+
 AC_ARG_ENABLE([profiling],
     [AC_HELP_STRING([--enable-profiling],
                     [Enable profiling (pshmem) interface tests (default:disabled)])])
@@ -127,6 +131,33 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
                    [AC_MSG_RESULT([no])
                     AC_MSG_ERROR([C compiler cannot compile SHMEM code])])
 AC_LANG_POP([C])
+
+if test "$enable_c11_checks" != "no" ; then
+    ORIG_CFLAGS=$CFLAGS
+    AC_MSG_CHECKING([if -std=gnu11 works])
+
+    AC_LANG_PUSH([C])
+    CFLAGS="-pedantic-errors -std=gnu11"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                       void g(int i){}
+                       #define f(X) _Generic((X), default: g)(X)
+                       ]], [[
+                            f(1);
+                            ]]
+                       )],
+                       [shmem_cv_c11_works="yes"], [shmem_cv_c11_works="no"])
+    AS_IF([test "$shmem_cv_c11_works" = "no"],
+          [AC_MSG_RESULT([no])
+          CFLAGS="$ORIG_CFLAGS"
+          AC_PROG_CC_C99
+          ],
+          [AC_MSG_RESULT([yes])
+          CFLAGS="-std=gnu11 $ORIG_CFLAGS"]
+          )
+    AC_LANG_POP([C])
+fi
+AM_CONDITIONAL([HAVE_C11], [test "$shmem_cv_c11_works" = "yes" -a "$enable_c11_checks" != "no"])
+
 
 if test "$enable_cxx" != "no" ; then
     AC_MSG_CHECKING([C++ compiler can compile SHMEM code])
