@@ -37,11 +37,11 @@ script:
     - mkdir build
     - cd build
       # Note: With gcc 4.8 in Ubuntu Trusty, pthreads configury doesn't seem to
-      # detect the need for -lpthread.
-    - ../configure CC=oshcc CXX=oshc++ FC=oshfort CFLAGS="-std=gnu99" FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread" --disable-c11-checks
+      # detect the need for -lpthread or -lm.
+    - ../configure CC=oshcc CXX=oshc++ FC=oshfort CFLAGS="-std=gnu99" FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread -lm" --disable-c11-checks
     - make $TRAVIS_PAR_MAKE
     - make check
     - make distclean
-    - ../configure CC=oshcc CXX=oshc++ FC=oshfort FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread"
+    - ../configure CC=oshcc CXX=oshc++ FC=oshfort FCFLAGS="-fcray-pointer" LDFLAGS="-lpthread -lm"
     - make $TRAVIS_PAR_MAKE
     - make check
