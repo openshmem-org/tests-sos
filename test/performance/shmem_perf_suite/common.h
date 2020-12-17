@@ -178,6 +178,7 @@ void set_metric_defaults(perf_metrics_t *metric_info) {
     char *val = NULL;
     metric_info->trials_multiplier = 1.0; /* Default 1 */
     val = getenv("SHMEM_PERF_SUITE_TRIALS_MULTIPLIER");
+
     if (val && strlen(val))
         metric_info->trials_multiplier = atof(val);
 
