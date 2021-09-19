@@ -118,14 +118,16 @@ int main(void) {
     ret = shmem_team_split_strided(SHMEM_TEAM_WORLD, 0, 2, (npes-1)/2 + 1,
                                     NULL, 0, &even_team);
 
-    if (ret == 0) {
-        if (me == 0) printf("Performing 2d split test on even team\n");
+    if (even_team != SHMEM_TEAM_INVALID) {
+        if (ret == 0) {
+            if (me == 0) printf("Performing 2d split test on even team\n");
 
-        errors += check_2d(even_team, 1);
-        errors += check_2d(even_team, 2);
-        errors += check_2d(even_team, 3);
-    } else {
-        if (me == 0) printf("Unable to create even team\n");
+            errors += check_2d(even_team, 1);
+            errors += check_2d(even_team, 2);
+            errors += check_2d(even_team, 3);
+        } else {
+            if (me == 0) printf("Unable to create even team\n");
+        }
     }
 
     shmem_finalize();
