@@ -69,6 +69,7 @@ check_PROGRAMS = \
 	c11_test_shmem_get \
 	c11_test_shmem_p \
 	c11_test_shmem_put \
+	c11_test_shmem_put_signal \
 	c11_test_shmem_atomic_fetch \
 	c11_test_shmem_atomic_set \
 	c11_test_shmem_atomic_add \
@@ -108,6 +109,7 @@ check_PROGRAMS = \
 	put_signal \
 	put_signal_nbi \
 	signal_fetch \
+	signal_wait_until \
 	shmem_team_b2b_collectives \
 	shmem_team_collect_active_set \
 	shmem_team_max \
@@ -115,6 +117,8 @@ check_PROGRAMS = \
 	shmem_team_shared \
 	shmem_team_split_2d \
 	shmem_team_translate \
+	shmem_team_reduce \
+	shmem_team_get_config \
 	atomic_nbi \
 	fadd_nbi
 
