@@ -29,6 +29,12 @@ AS_IF([test -z "$AM_V"],
    AC_SUBST([AM_V])
    AC_SUBST([AM_DEFAULT_V])])
 
+dnl check for programs
+AC_PROG_CC([oshcc])
+AM_PROG_CC_C_O
+AC_C_INLINE
+AC_PROG_CXX([oshc++]) dnl required even with --disable-cxx due to automake conditionals
+
 dnl information on the package
 AC_ARG_ENABLE([picky],
     [AC_HELP_STRING([--enable-picky],
@@ -100,14 +106,8 @@ AC_ARG_ENABLE([shmemx],
                     [Enable SHMEM extensions tests (default:disabled)])])
 AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx" = "yes"])
 
-dnl check for programs
-AC_PROG_CC
-AM_PROG_CC_C_O
-AC_C_INLINE
-AC_PROG_CXX dnl required even with --disable-cxx due to automake conditionals
-
 if test "$enable_fortran" != "no" ; then
-  AC_PROG_FC
+  AC_PROG_FC([oshfort])
 else
   FC=
 fi
@@ -210,6 +210,8 @@ fi
 if test "$enable_debug" = "yes" ; then
   CFLAGS="$CFLAGS -g"
 fi
+
+AC_SEARCH_LIBS([ceil], [m], [], AC_MSG_ERROR([unable to find ceil() function]))
 
 AM_CONDITIONAL([HAVE_FORTRAN], [test "$FC" != ""])
 AM_CONDITIONAL([HAVE_CXX], [test "$enable_cxx" != "no" ])
