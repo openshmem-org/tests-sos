@@ -32,6 +32,15 @@
 
 long ctr = 0;
 
+#ifndef HAVE_SHMEMX_WTIME
+#include <sys/time.h>
+static double shmemx_wtime(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (double) tv.tv_sec + (double) tv.tv_usec / 1000000.0;
+}
+#endif /* HAVE_SHMEMX_WTIME */
+
 int main(void) {
     int me, npes, i;
     long *out;
