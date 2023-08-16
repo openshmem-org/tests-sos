@@ -44,6 +44,11 @@ AC_ARG_ENABLE([debug],
     [AC_HELP_STRING([--enable-debug],
                     [Include debugging symbols (default: disabled)])])
 
+AC_ARG_ENABLE([deprecated-tests],
+    [AC_HELP_STRING([--enable-deprecated-tests],
+                    [Enable deprecated SHMEM API calls in tests (default:disabled)])])
+AM_CONDITIONAL([ENABLE_DEPRECATED_TESTS], [test "$enable_deprecated_tests" = "yes"])
+
 AC_ARG_WITH([test-runner],
     [AC_HELP_STRING([--with-test-runner],
                     [Command used to run tests (default: 'oshrun -np $(NPROCS)')])])
