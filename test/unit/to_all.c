@@ -94,6 +94,7 @@ double src4[N], dst4[N];
 long double src5[N], dst5[N];
 long long src6[N], dst6[N];
 
+/* bitwise reduction types */
 unsigned short src7[N], dst7[N];
 unsigned int src8[N], dst8[N];
 unsigned long src9[N], dst9[N];

@@ -166,7 +166,7 @@ int main(void) {
     shmem_int_and_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_and_to_all", in, out);
 #else
-    uin = (unsigned) me; uout = -1U;
+    uin = (unsigned int) me; uout = -1U;
     if (new_team != SHMEM_TEAM_INVALID)
         shmem_uint_and_reduce(new_team, &uin, &uout, 1);
     CHECK("shmem_uint_and_reduce", uin, uout);
@@ -178,7 +178,7 @@ int main(void) {
     shmem_int_or_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_or_to_all", in, out);
 #else
-    uin = (unsigned) me; uout = -1U;
+    uin = (unsigned int) me; uout = -1U;
     if (new_team != SHMEM_TEAM_INVALID)
         shmem_uint_or_reduce(new_team, &uin, &uout, 1);
     CHECK("shmem_uint_or_reduce", uin, uout);
@@ -190,7 +190,7 @@ int main(void) {
     shmem_int_xor_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_xor_to_all", in, out);
 #else
-    uin = (unsigned) me; uout = -1U;
+    uin = (unsigned int) me; uout = -1U;
     if (new_team != SHMEM_TEAM_INVALID)
         shmem_uint_xor_reduce(new_team, &uin, &uout, 1);
     CHECK("shmem_uint_xor_reduce", uin, uout);
