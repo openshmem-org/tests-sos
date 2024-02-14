@@ -45,7 +45,7 @@ bin_PROGRAMS = $(check_PROGRAMS)
 AM_CPPFLAGS = -I$(top_srcdir)/test/include
 LDADD =
 else
-AM_CPPFLAGS = -I$(top_builddir)/mpp -I$(top_srcdir)/mpp -I$(top_srcdir)/test/include
+AM_CPPFLAGS = -I$(top_builddir)/mpp -I$(top_srcdir)/mpp -I../include
 LDADD = $(top_builddir)/src/libsma.la
 endif
 
