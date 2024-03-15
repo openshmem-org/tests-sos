@@ -32,7 +32,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <shmem.h>
 #include <shmemx.h>
@@ -49,11 +48,11 @@
                                                                 \
     if (USE_CTX)                                                \
       shmemx_ctx_##TYPENAME##_ibget(SHMEM_CTX_DEFAULT, local,   \
-                            remote, 1, 1, 1, 10,                \
-                            (mype + 1) % npes);                 \
+                                    remote, 1, 1, 1, 10,        \
+                                    (mype + 1) % npes);         \
     else                                                        \
       shmemx_##TYPENAME##_ibget(local, remote, 1, 1, 1, 10,     \
-                                    (mype + 1) % npes);         \
+                                (mype + 1) % npes);             \
                                                                 \
     for (int i = 0; i < 10; i++)                                \
       if (local[i] != (TYPE)((mype + 1) % npes)) {              \

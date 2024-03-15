@@ -32,7 +32,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <shmem.h>
 #include <shmemx.h>
@@ -48,11 +47,11 @@
                                                                 \
     if (USE_CTX)                                                \
       shmemx_ctx_##TYPENAME##_ibput(SHMEM_CTX_DEFAULT, remote,  \
-                              local, 1, 1, 1, 10,               \
-                              (mype + 1) % npes);               \
+                                    local, 1, 1, 1, 10,         \
+                                    (mype + 1) % npes);         \
     else                                                        \
       shmemx_##TYPENAME##_ibput(remote, local, 1, 1, 1, 10,     \
-                                    (mype + 1) % npes);         \
+                                (mype + 1) % npes);             \
                                                                 \
     shmem_barrier_all();                                        \
     for (int i = 0; i < 10; i++)                                \

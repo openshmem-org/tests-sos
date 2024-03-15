@@ -63,7 +63,7 @@
   } while (0)
 
 #else
-#define TEST_SHMEM_PUT(USE_CTX, TYPE)
+#define TEST_SHMEM_IBPUT(USE_CTX, TYPE)
 
 #endif
 

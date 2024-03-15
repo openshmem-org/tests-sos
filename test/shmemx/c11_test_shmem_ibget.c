@@ -63,7 +63,7 @@
   } while (0)
 
 #else
-#define TEST_SHMEM_GET(USE_CTX, TYPE)
+#define TEST_SHMEM_IBGET(USE_CTX, TYPE)
 
 #endif
 
