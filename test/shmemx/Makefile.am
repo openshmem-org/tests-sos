@@ -20,6 +20,8 @@ endif
 
 if SHMEMX_TESTS
 check_PROGRAMS += \
+	c11_test_shmem_ibput \
+	c11_test_shmem_ibget \
 	perf_counter \
 	shmemx_team_node \
 	shmem_malloc_with_hints
@@ -35,8 +37,10 @@ if SHMEMX_TESTS
 check_PROGRAMS += \
 	cxx_test_shmem_g \
 	cxx_test_shmem_get \
+	cxx_test_shmem_ibget \
 	cxx_test_shmem_p \
 	cxx_test_shmem_put \
+	cxx_test_shmem_ibput \
 	cxx_test_shmem_atomic_fetch \
 	cxx_test_shmem_atomic_set \
 	cxx_test_shmem_atomic_add \
@@ -88,8 +92,10 @@ endif
 # C++ Tests
 cxx_test_shmem_g_SOURCES = cxx_test_shmem_g.cpp
 cxx_test_shmem_get_SOURCES = cxx_test_shmem_get.cpp
+cxx_test_shmem_ibget_SOURCES = cxx_test_shmem_ibget.cpp
 cxx_test_shmem_p_SOURCES = cxx_test_shmem_p.cpp
 cxx_test_shmem_put_SOURCES = cxx_test_shmem_put.cpp
+cxx_test_shmem_ibput_SOURCES = cxx_test_shmem_ibput.cpp
 cxx_test_shmem_atomic_fetch_SOURCES = cxx_test_shmem_atomic_fetch.cpp
 cxx_test_shmem_atomic_set_SOURCES = cxx_test_shmem_atomic_set.cpp
 cxx_test_shmem_atomic_add_SOURCES = cxx_test_shmem_atomic_add.cpp
