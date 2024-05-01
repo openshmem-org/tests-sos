@@ -24,7 +24,9 @@ check_PROGRAMS += \
 	c11_test_shmem_ibget \
 	perf_counter \
 	shmemx_team_node \
-	shmem_malloc_with_hints
+	shmem_malloc_with_hints \
+        signal_add \
+        signal_set
 
 if HAVE_PTHREADS
 check_PROGRAMS += \
