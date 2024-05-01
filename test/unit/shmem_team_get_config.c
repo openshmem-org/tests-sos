@@ -31,7 +31,7 @@
 int main(void)
 {
     int                 my_pe, npes, ret, errors = 0;
-    shmem_team_t        even_team;
+    shmem_team_t        even_team, odd_team;
     shmem_team_config_t config;
     shmem_team_config_t new_config;
 
@@ -39,6 +39,12 @@ int main(void)
     my_pe  = shmem_my_pe();
     npes   = shmem_n_pes();
 
+    if (npes < 2) {
+        if (my_pe == 0)
+            printf("Test requires 2 or more PEs\n");
+        shmem_finalize();
+        return 0;
+    }
 
     ret = shmem_team_get_config(SHMEM_TEAM_WORLD, SHMEM_TEAM_NUM_CONTEXTS, &config);
 
@@ -56,7 +62,7 @@ int main(void)
 
     config.num_contexts = 3;
 
-    shmem_team_split_strided(SHMEM_TEAM_WORLD, 0, 2, ((npes-1)/2)+1, &config, 0, &even_team);
+    shmem_team_split_strided(SHMEM_TEAM_WORLD, 0, 2, ((npes-1)/2)+1, &config, SHMEM_TEAM_NUM_CONTEXTS, &even_team);
 
     ret = shmem_team_get_config(even_team, SHMEM_TEAM_NUM_CONTEXTS, &new_config);
 
@@ -70,6 +76,22 @@ int main(void)
         printf("PE %d: unexpected return value from non-team members (%d)\n", my_pe, ret);
         ++errors;
     }
+
+    shmem_team_split_strided(SHMEM_TEAM_WORLD, 1, 2, npes/2, &config, 0, &odd_team);
+
+    ret = shmem_team_get_config(odd_team, SHMEM_TEAM_NUM_CONTEXTS, &new_config);
+
+    if (shmem_team_my_pe(odd_team) != -1 &&
+           (new_config.num_contexts != 0  || ret != 0)) {
+        printf("PE %d: unexpected num_contexts (%d)\n", my_pe, new_config.num_contexts);
+        ++errors;
+    }
+
+    if (shmem_team_my_pe(odd_team) == -1 && ret == 0) {
+        printf("PE %d: unexpected return value from non-team members (%d)\n", my_pe, ret);
+        ++errors;
+    }
+
 
     shmem_finalize();
     return errors != 0;
