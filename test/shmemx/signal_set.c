@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
         shmem_long_put_nbi(target, source, MSG_SZ, dest_pe);
         shmemx_signal_set(SHMEM_CTX_DEFAULT, &sig_addr, me + 1, dest_pe);
     }
-    shmem_barrier_all();
 
     for (i = 0; i < MSG_SZ; i++) {
         if (target[i] != (long)(((me + npes - 1) % npes) + i)) {

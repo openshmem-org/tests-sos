@@ -63,10 +63,10 @@ int main(int argc, char *argv[])
     for (i = 0; i < npes; i++) {
         shmem_long_put(target, source, MSG_SZ, i);
         shmem_fence();
-	shmemx_signal_add(&sig_addr, me, i);
+	shmemx_signal_add(&sig_addr, me + 1, i);
     }
 
-    shmem_signal_wait_until(&sig_addr, SHMEM_CMP_EQ, (uint64_t) ((npes * (npes - 1)) / 2));
+    shmem_signal_wait_until(&sig_addr, SHMEM_CMP_EQ, (uint64_t) ((npes * (npes + 1)) / 2));
 
     for (i = 0; i < MSG_SZ; i++) {
         if (target[i] != source[i]) {
