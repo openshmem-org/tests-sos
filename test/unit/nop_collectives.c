@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <shmem.h>
 
+#ifdef ENABLE_DEPRECATED_TESTS
 long bcast_psync[SHMEM_BCAST_SYNC_SIZE];
 long collect_psync[SHMEM_COLLECT_SYNC_SIZE];
 long reduce_psync[SHMEM_REDUCE_SYNC_SIZE];
@@ -36,6 +37,7 @@ long alltoall_psync[SHMEM_ALLTOALL_SYNC_SIZE];
 long alltoalls_psync[SHMEM_ALLTOALLS_SYNC_SIZE];
 
 int pwrk[SHMEM_REDUCE_MIN_WRKDATA_SIZE];
+#endif
 
 int main(void) {
     int me;

@@ -91,7 +91,7 @@ AC_ARG_ENABLE([lengthy-tests],
 AM_CONDITIONAL([ENABLE_LENGTHY_TESTS], [test "$enable_lengthy_tests" = "yes"])
 
 AC_ARG_ENABLE([fortran],
-    [AC_HELP_STRING([--disable-fortran],
+    [AC_HELP_STRING([--enable-fortran],
                     [Disable Fortran tests (default: disabled)])])
 
 AC_ARG_ENABLE([cxx],
