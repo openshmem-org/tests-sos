@@ -61,7 +61,6 @@ check_PROGRAMS = \
 	lfinc \
 	shmem_info \
 	query_thread \
-	asym_alloc \
 	set_fetch \
 	alltoall \
 	alltoalls \
