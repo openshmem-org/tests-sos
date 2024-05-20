@@ -30,6 +30,7 @@
  */
 
 #include <shmem.h>
+#include <stdio.h>
 
 int main(void)
 {
@@ -41,14 +42,16 @@ int main(void)
     int *status = NULL;
 
     for (int i = 0; i < npes; i++)
-        shmem_int_p(&flags[mype], 1, i);
+        shmem_int_atomic_set(&flags[mype], 1, i);
 
     while (!shmem_int_test_all(flags, npes, status, SHMEM_CMP_EQ, 1));
 
     /* Check the flags array */
     for (int i = 0; i < npes; i++) {
-        if (flags[i] != 1)
+        if (flags[i] != 1) {
+            printf("[%d] incorrect value at index %d (%d)\n", mype, i, flags[i]);
             shmem_global_exit(1);
+        }
     }
     shmem_free(flags);
     shmem_finalize();

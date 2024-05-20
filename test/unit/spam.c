@@ -396,14 +396,16 @@ bcast(int *target, int *src, int elements, int me, int npes, int loops)
 {
     int i;
     double start_time, elapsed_time;
-    long *ps, *pSync, *pSync1;
     long total_bytes = loops * elements * sizeof(*src);
 
+#ifdef ENABLE_DEPRECATED_TESTS
+    long *ps, *pSync, *pSync1;
     pSync = (long*)shmem_malloc( 2 * sizeof(long) * SHMEM_BCAST_SYNC_SIZE );
     pSync1 = &pSync[SHMEM_BCAST_SYNC_SIZE];
     for (i = 0; i < SHMEM_BCAST_SYNC_SIZE; i++) {
         pSync[i] = pSync1[i] = SHMEM_SYNC_VALUE;
     }
+#endif
 
     if (me==0 && Verbose) {
         fprintf(stdout, "%s: %d loops of broadcast32(%ld bytes) over %d PEs: ",
@@ -415,8 +417,12 @@ bcast(int *target, int *src, int elements, int me, int npes, int loops)
 
     start_time = tests_sos_wtime();
     for(i = 0; i < loops; i++) {
+#ifdef ENABLE_DEPRECATED_TESTS
         ps = (i & 1) ? pSync1 : pSync;
         shmem_broadcast32( target, src, elements, 0, 0, 0, npes, ps );
+#else
+        shmem_int_broadcast( SHMEM_TEAM_WORLD, target, src, elements, 0 );
+#endif
     }
     elapsed_time = tests_sos_wtime() - start_time;
 
@@ -428,7 +434,9 @@ bcast(int *target, int *src, int elements, int me, int npes, int loops)
                ((double)total_bytes/(1024.0*1024.0)) / elapsed_time );
     }
     shmem_barrier_all();
+#ifdef ENABLE_DEPRECATED_TESTS
     shmem_free( pSync );
+#endif
 }
 
 
@@ -438,13 +446,15 @@ collect(int *target, int *src, int elements, int me, int npes, int loops)
     int i;
     double start_time, elapsed_time;
     long total_bytes = loops * elements * sizeof(*src);
-    long *ps, *pSync, *pSync1;
 
+#ifdef ENABLE_DEPRECATED_TESTS
+    long *ps, *pSync, *pSync1;
     pSync = (long*) shmem_malloc( 2 * sizeof(long) * SHMEM_COLLECT_SYNC_SIZE );
     pSync1 = &pSync[SHMEM_COLLECT_SYNC_SIZE];
     for (i = 0; i < SHMEM_COLLECT_SYNC_SIZE; i++) {
         pSync[i] = pSync1[i] = SHMEM_SYNC_VALUE;
     }
+#endif
     target = (int *) shmem_malloc( elements * sizeof(*target) * npes );
 
     if (me==0 && Verbose) {
@@ -457,8 +467,12 @@ collect(int *target, int *src, int elements, int me, int npes, int loops)
 
     start_time = tests_sos_wtime();
     for(i = 0; i < loops; i++) {
+#ifdef ENABLE_DEPRECATED_TESTS
         ps = (i & 1) ? pSync1 : pSync;
         shmem_collect32( target, src, elements, 0, 0, npes, ps );
+#else
+        shmem_int_collect( SHMEM_TEAM_WORLD, target, src, elements );
+#endif
     }
     elapsed_time = tests_sos_wtime() - start_time;
 
@@ -471,7 +485,9 @@ collect(int *target, int *src, int elements, int me, int npes, int loops)
     }
     shmem_barrier_all();
     shmem_free(target);
+#ifdef ENABLE_DEPRECATED_TESTS
     shmem_free( pSync );
+#endif
     shmem_barrier_all();
 }
 
@@ -483,13 +499,15 @@ fcollect(int *target, int *src, int elements, int me, int npes, int loops)
     int i;
     double start_time, elapsed_time;
     long total_bytes = loops * elements * sizeof(*src);
-    long *ps, *pSync, *pSync1;
 
+#ifdef ENABLE_DEPRECATED_TESTS
+    long *ps, *pSync, *pSync1;
     pSync = (long*) shmem_malloc( 2 * sizeof(long) * SHMEM_COLLECT_SYNC_SIZE );
     pSync1 = &pSync[SHMEM_COLLECT_SYNC_SIZE];
     for (i = 0; i < SHMEM_COLLECT_SYNC_SIZE; i++) {
         pSync[i] = pSync1[i] = SHMEM_SYNC_VALUE;
     }
+#endif
     target = (int *) shmem_malloc( elements * sizeof(*target) * npes );
 
     if (me==0 && Verbose) {
@@ -502,8 +520,12 @@ fcollect(int *target, int *src, int elements, int me, int npes, int loops)
 
     start_time = tests_sos_wtime();
     for(i = 0; i < loops; i++) {
+#ifdef ENABLE_DEPRECATED_TESTS
         ps = &pSync[(i&1)];
         shmem_fcollect32( target, src, elements, 0, 0, npes, ps );
+#else
+        shmem_int_fcollect( SHMEM_TEAM_WORLD, target, src, elements );
+#endif
     }
     elapsed_time = tests_sos_wtime() - start_time;
 
@@ -516,7 +538,9 @@ fcollect(int *target, int *src, int elements, int me, int npes, int loops)
     }
     shmem_barrier_all();
     shmem_free(target);
+#ifdef ENABLE_DEPRECATED_TESTS
     shmem_free( pSync );
+#endif
     shmem_barrier_all();
 }
 
