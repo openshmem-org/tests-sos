@@ -60,6 +60,7 @@ check_PROGRAMS = \
 	bcast_flood \
 	lfinc \
 	shmem_info \
+	query_initialized \
 	query_thread \
 	set_fetch \
 	alltoall \
