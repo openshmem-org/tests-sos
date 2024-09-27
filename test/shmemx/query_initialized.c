@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2018 Intel Corporation. All rights reserved.
+ *  Copyright (c) 2024 Intel Corporation. All rights reserved.
  *  This software is available to you under the BSD license below:
  *
  *      Redistribution and use in source and binary forms, with or
@@ -30,7 +30,11 @@
 
 int main(int argc, char* argv[])
 {
-    int initialized, init_count, finalize_count;
+    int initialized;
+    int init_count = 3;
+    int finalize_count = 3;
+    int inits_done = 0;
+    int finalizes_done = 0;
 
     // Check if SHMEM is initialized before calling init
     shmem_query_initialized(&initialized);
@@ -39,11 +43,11 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    init_count = 3;
-    finalize_count = 3;
-
+    // Initialize SHMEM multiple times
     for (int i = 0; i < init_count; i++) {
         shmem_init();
+        inits_done++;
+
         shmem_query_initialized(&initialized);
         if (initialized == 0) {
             printf("ERR: Initialization failed on iteration %d\n", i + 1);
@@ -51,14 +55,19 @@ int main(int argc, char* argv[])
         }
     }
 
+    // Finalize SHMEM multiple times
     for (int i = 0; i < finalize_count; i++) {
         shmem_finalize();
+        finalizes_done++;
+
         shmem_query_initialized(&initialized);
-        if (initialized != 0 && i == finalize_count - 1) {
-            printf("ERR: Finalization failed on final iteration\n");
+
+        if (inits_done > finalizes_done && initialized == 0) {
+            printf("ERR: SHMEM should still be initialized after finalize iteration %d\n", i + 1);
             return 1;
-        } else if (initialized == 0) {
-            printf("ERR: Finalization failed on iteration %d\n", i + 1);
+        } else if (initialized != 0) {
+            printf("ERR: SHMEM should be finalized after finalize iteration %d\n", i + 1);
+            return 1;
         }
     }
 

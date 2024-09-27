@@ -23,6 +23,7 @@ check_PROGRAMS += \
 	c11_test_shmem_ibput \
 	c11_test_shmem_ibget \
 	perf_counter \
+	query_initialized \
 	shmemx_team_node \
 	shmem_malloc_with_hints \
         signal_add \
