@@ -39,8 +39,6 @@
 int32_t src[MAX_NPES];
 int32_t dst[MAX_NPES*MAX_NPES];
 
-long pSync[SHMEM_COLLECT_SYNC_SIZE];
-
 int main(int argc, char **argv) {
     int me, npes;
     int i, j, errors = 0;
@@ -57,9 +55,6 @@ int main(int argc, char **argv) {
         shmem_finalize();
         return 0;
     }
-
-    for (i = 0; i < SHMEM_COLLECT_SYNC_SIZE; i++)
-        pSync[i] = SHMEM_SYNC_VALUE;
 
     for (i = 0; i < MAX_NPES; i++)
         src[i] = -1;

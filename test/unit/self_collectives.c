@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <shmem.h>
 
+#ifdef ENABLE_DEPRECATED_TESTS
 long bcast_psync[SHMEM_BCAST_SYNC_SIZE];
 long collect_psync[SHMEM_COLLECT_SYNC_SIZE];
 long reduce_psync[SHMEM_REDUCE_SYNC_SIZE];
@@ -36,6 +37,7 @@ long alltoall_psync[SHMEM_ALLTOALL_SYNC_SIZE];
 long alltoalls_psync[SHMEM_ALLTOALLS_SYNC_SIZE];
 
 int pwrk[SHMEM_REDUCE_MIN_WRKDATA_SIZE];
+#endif
 
 #define CHECK(func, in, out)                                            \
     do {                                                                \
@@ -55,6 +57,7 @@ int main(void) {
     int i, errors = 0;
     int me;
 
+#ifdef ENABLE_DEPRECATED_TESTS
     for (i = 0; i < SHMEM_BCAST_SYNC_SIZE; i++)
         bcast_psync[i] = SHMEM_SYNC_VALUE;
 
@@ -72,6 +75,7 @@ int main(void) {
 
     for (i = 0; i < SHMEM_REDUCE_MIN_WRKDATA_SIZE; i++)
         pwrk[i] = 0;
+#endif
 
     shmem_init();
 
@@ -84,9 +88,10 @@ int main(void) {
     if (me == 0) printf(" + broadcast\n");
 
 #ifndef ENABLE_DEPRECATED_TESTS
-    /* Set up active set team (start=me, stride=1, size=1) for all tests*/
+    /* Set up a single-PE team (start=0, stride=1, size=1) for all team tests. */
+    /* Active-set tests are permitted to start at "self" (start=me, stride=1, size=1) */
     shmem_team_t new_team;
-    shmem_team_split_strided(SHMEM_TEAM_WORLD, me, 1, 1, NULL, 0, &new_team);
+    shmem_team_split_strided(SHMEM_TEAM_WORLD, 0, 1, 1, NULL, 0, &new_team);
 #endif
 
     in_32 = me; out_32 = -1;
@@ -94,9 +99,10 @@ int main(void) {
     shmem_broadcast32(&in_32, &out_32, 1, 0, me, 0, 1, bcast_psync);
     CHECK("shmem_broadcast32", -1, out_32);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int32_broadcast(new_team, &in_32, &out_32, 1, 0);
-    CHECK("shmem_int32_broadcast", -1, out_32);
+        CHECK("shmem_int32_broadcast", -1, out_32);
+    }
 #endif
     shmem_barrier_all();
 
@@ -105,9 +111,10 @@ int main(void) {
     shmem_broadcast64(&in_64, &out_64, 1, 0, me, 0, 1, bcast_psync);
     CHECK("shmem_broadcast64", -1, out_64);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int64_broadcast(new_team, &in_64, &out_64, 1, 0);
-    CHECK("shmem_int64_broadcast", -1, out_64);
+        CHECK("shmem_int64_broadcast", -1, out_64);
+    }
 #endif
     shmem_barrier_all();
 
@@ -119,9 +126,10 @@ int main(void) {
     shmem_fcollect32(&in_32, &out_32, 1, me, 0, 1, collect_psync);
     CHECK("shmem_fcollect32", in_32, out_32);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int32_fcollect(new_team, &in_32, &out_32, 1);
-    CHECK("shmem_int32_fcollect", in_32, out_32);
+        CHECK("shmem_int32_fcollect", in_32, out_32);
+    }
 #endif
     shmem_barrier_all();
 
@@ -130,9 +138,10 @@ int main(void) {
     shmem_fcollect64(&in_64, &out_64, 1, me, 0, 1, collect_psync);
     CHECK("shmem_fcollect64", in_64, out_64);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int64_fcollect(new_team, &in_64, &out_64, 1);
-    CHECK("shmem_int64_fcollect", in_64, out_64);
+        CHECK("shmem_int64_fcollect", in_64, out_64);
+    }
 #endif
     shmem_barrier_all();
 
@@ -141,9 +150,10 @@ int main(void) {
     shmem_collect32(&in_32, &out_32, 1, me, 0, 1, collect_psync);
     CHECK("shmem_collect32", in_32, out_32);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int32_collect(new_team, &in_32, &out_32, 1);
-    CHECK("shmem_int32_collect", in_32, out_32);
+        CHECK("shmem_int32_collect", in_32, out_32);
+    }
 #endif
     shmem_barrier_all();
 
@@ -152,9 +162,10 @@ int main(void) {
     shmem_collect64(&in_64, &out_64, 1, me, 0, 1, collect_psync);
     CHECK("shmem_collect64", in_64, out_64);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int64_collect(new_team, &in_64, &out_64, 1);
-    CHECK("shmem_int64_collect", in_64, out_64);
+        CHECK("shmem_int64_collect", in_64, out_64);
+    }
 #endif
     shmem_barrier_all();
 
@@ -167,9 +178,10 @@ int main(void) {
     CHECK("shmem_int_and_to_all", in, out);
 #else
     uin = (unsigned int) me; uout = -1U;
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_uint_and_reduce(new_team, &uin, &uout, 1);
-    CHECK("shmem_uint_and_reduce", uin, uout);
+        CHECK("shmem_uint_and_reduce", uin, uout);
+    }
 #endif
     shmem_barrier_all();
 
@@ -179,9 +191,10 @@ int main(void) {
     CHECK("shmem_int_or_to_all", in, out);
 #else
     uin = (unsigned int) me; uout = -1U;
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_uint_or_reduce(new_team, &uin, &uout, 1);
-    CHECK("shmem_uint_or_reduce", uin, uout);
+        CHECK("shmem_uint_or_reduce", uin, uout);
+    }
 #endif
     shmem_barrier_all();
 
@@ -191,9 +204,10 @@ int main(void) {
     CHECK("shmem_int_xor_to_all", in, out);
 #else
     uin = (unsigned int) me; uout = -1U;
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_uint_xor_reduce(new_team, &uin, &uout, 1);
-    CHECK("shmem_uint_xor_reduce", uin, uout);
+        CHECK("shmem_uint_xor_reduce", uin, uout);
+    }
 #endif
     shmem_barrier_all();
 
@@ -202,9 +216,10 @@ int main(void) {
     shmem_int_min_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_min_to_all", in, out);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int_min_reduce(new_team, &in, &out, 1);
-    CHECK("shmem_int_min_reduce", in, out);
+        CHECK("shmem_int_min_reduce", in, out);
+    }
 #endif
     shmem_barrier_all();
 
@@ -213,9 +228,10 @@ int main(void) {
     shmem_int_max_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_max_to_all", in, out);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int_max_reduce(new_team, &in, &out, 1);
-    CHECK("shmem_int_max_to_all", in, out);
+        CHECK("shmem_int_max_to_all", in, out);
+    }
 #endif
     shmem_barrier_all();
 
@@ -224,9 +240,10 @@ int main(void) {
     shmem_int_sum_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_sum_to_all", in, out);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int_sum_reduce(new_team, &in, &out, 1);
-    CHECK("shmem_int_sum_reduce", in, out);
+        CHECK("shmem_int_sum_reduce", in, out);
+    }
 #endif
     shmem_barrier_all();
 
@@ -235,9 +252,10 @@ int main(void) {
     shmem_int_prod_to_all(&in, &out, 1, me, 0, 1, pwrk, reduce_psync);
     CHECK("shmem_int_prod_to_all", in, out);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int_prod_reduce(new_team, &in, &out, 1);
-    CHECK("shmem_int_prod_reduce", in, out);
+        CHECK("shmem_int_prod_reduce", in, out);
+    }
 #endif
     shmem_barrier_all();
 
@@ -249,9 +267,10 @@ int main(void) {
     shmem_alltoall32(&in_32, &out_32, 1, me, 0, 1, alltoall_psync);
     CHECK("shmem_alltoall32", in_32, out_32);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int32_alltoall(new_team, &in_32, &out_32, 1);
-    CHECK("shmem_int32_alltoall", in_32, out_32);
+        CHECK("shmem_int32_alltoall", in_32, out_32);
+    }
 #endif
     shmem_barrier_all();
 
@@ -260,9 +279,10 @@ int main(void) {
     shmem_alltoall64(&in_64, &out_64, 1, me, 0, 1, alltoall_psync);
     CHECK("shmem_alltoall64", in_64, out_64);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int64_alltoall(new_team, &in_64, &out_64, 1);
-    CHECK("shmem_int64_alltoall", in_64, out_64);
+        CHECK("shmem_int64_alltoall", in_64, out_64);
+    }
 #endif
     shmem_barrier_all();
 
@@ -271,9 +291,10 @@ int main(void) {
     shmem_alltoalls32(&in_32, &out_32, 1, 1, 1, me, 0, 1, alltoalls_psync);
     CHECK("shmem_alltoalls32", in_32, out_32);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int32_alltoalls(new_team, &in_32, &out_32, 1, 1, 1);
-    CHECK("shmem_int32_alltoalls", in_32, out_32);
+        CHECK("shmem_int32_alltoalls", in_32, out_32);
+    }
 #endif
     shmem_barrier_all();
 
@@ -282,9 +303,10 @@ int main(void) {
     shmem_alltoalls64(&in_64, &out_64, 1, 1, 1, me, 0, 1, alltoalls_psync);
     CHECK("shmem_alltoalls64", in_64, out_64);
 #else
-    if (new_team != SHMEM_TEAM_INVALID)
+    if (new_team != SHMEM_TEAM_INVALID) {
         shmem_int64_alltoalls(new_team, &in_64, &out_64, 1, 1, 1);
-    CHECK("shmem_int64_alltoalls", in_64, out_64);
+        CHECK("shmem_int64_alltoalls", in_64, out_64);
+    }
 #endif
     shmem_barrier_all();
 

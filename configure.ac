@@ -13,7 +13,7 @@
 
 dnl Init Autoconf/Automake/Libtool
 
-AC_INIT([Sandia OpenSHMEM Test Suite], [1.4.3], [https://github.com/Sandia-OpenSHMEM/SOS])
+AC_INIT([Sandia OpenSHMEM Test Suite], [1.5.2], [https://github.com/Sandia-OpenSHMEM/SOS])
 AC_PREREQ([2.60])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
@@ -91,8 +91,8 @@ AC_ARG_ENABLE([lengthy-tests],
 AM_CONDITIONAL([ENABLE_LENGTHY_TESTS], [test "$enable_lengthy_tests" = "yes"])
 
 AC_ARG_ENABLE([fortran],
-    [AC_HELP_STRING([--disable-fortran],
-                    [Disable Fortran tests (default: enabled)])])
+    [AC_HELP_STRING([--enable-fortran],
+                    [Disable Fortran tests (default: disabled)])])
 
 AC_ARG_ENABLE([cxx],
     [AC_HELP_STRING([--disable-cxx],
@@ -111,7 +111,7 @@ AC_ARG_ENABLE([shmemx],
                     [Enable SHMEM extensions tests (default:disabled)])])
 AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx" = "yes"])
 
-if test "$enable_fortran" != "no" ; then
+if test "$enable_fortran" = "yes" ; then
   AC_PROG_FC([oshfort])
 else
   FC=

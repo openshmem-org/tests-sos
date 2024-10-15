@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-/* Multi-threaded tests for validation of memory barrier implemented in 
+/* Multi-threaded tests for validation of memory barrier implemented in
  * different synchronization routines.
 */
 
@@ -49,9 +49,6 @@ int me, npes, errors = 0, sum_error = 0;
 long lock = 0;
 
 pthread_barrier_t fencebar;
-
-long pSync[SHMEM_REDUCE_SYNC_SIZE];
-int pWrk[MAX(1, SHMEM_REDUCE_MIN_WRKDATA_SIZE)];
 
 static void * thread_main(void *arg) {
     int tid = *(int *) arg;
@@ -202,10 +199,6 @@ int main(int argc, char **argv) {
 
     me = shmem_my_pe();
     npes = shmem_n_pes();
-
-    for (i = 0; i < SHMEM_REDUCE_SYNC_SIZE; i++) {
-        pSync[i] = SHMEM_SYNC_VALUE;
-    }
 
     pthread_barrier_init(&fencebar, NULL, T);
 
