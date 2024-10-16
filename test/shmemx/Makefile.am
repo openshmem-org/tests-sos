@@ -20,13 +20,16 @@ endif
 
 if SHMEMX_TESTS
 check_PROGRAMS += \
-	c11_test_shmem_ibput \
-	c11_test_shmem_ibget \
-	perf_counter \
-	shmemx_team_node \
-	shmem_malloc_with_hints \
-        signal_add \
-        signal_set
+    c11_test_shmem_ibput \
+    c11_test_shmem_ibget \
+    perf_counter \
+    shmemx_team_node \
+    shmem_malloc_with_hints \
+    signal_add \
+    signal_set
+    ex_scan \
+    in_scan \
+    scan_in_place
 
 if HAVE_PTHREADS
 check_PROGRAMS += \
