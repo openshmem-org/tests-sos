@@ -57,10 +57,9 @@ int main(void)
     shmemx_long_sum_inscan(SHMEM_TEAM_WORLD, dest, src, NELEM);
     
     /* Validate inscan */
-    for (int j = 0; j < NELEM; j++) {
-        
+    for (int j = 0; j < NELEM; j++) {        
         if (dest[j] != expected[j]) {
-            printf("%d: Expected dest[%d] = %ld, got dest[%d] = %ld\n", me, j, expected[j], j, dest[j]);
+            printf("%d: Expected dest[%d] = %ld, got %ld\n", me, j, expected[j], dest[j]);
             errors++;
         }
     }

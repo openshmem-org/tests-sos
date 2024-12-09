@@ -49,7 +49,7 @@ int main(void)
     }
     
     for (int i = 0; i < NELEM; i++) {
-        expected[i] = ((me + i) * ((me + 1 + i)) / 2 - (i * (i - 1)) / 2) - (me+i);
+        expected[i] = ((me + i) * ((me + 1 + i)) / 2 - (i * (i - 1)) / 2) - (me + i);
     }
     
     shmem_barrier_all();
@@ -57,10 +57,9 @@ int main(void)
     shmemx_long_sum_exscan(SHMEM_TEAM_WORLD, dest, src, NELEM);
     
     /* Validate exscan */
-    for (int j = 0; j < NELEM; j++) {
-        
+    for (int j = 0; j < NELEM; j++) {        
         if (dest[j] != expected[j]) {
-            printf("%d: Expected dest[%d] = %ld, got dest[%d] = %ld\n", me, j, expected[j], j, dest[j]);
+            printf("%d: Expected dest[%d] = %ld, got %ld\n", me, j, expected[j], dest[j]);
             errors++;
         }
     }

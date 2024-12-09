@@ -26,7 +26,7 @@ check_PROGRAMS += \
     shmemx_team_node \
     shmem_malloc_with_hints \
     signal_add \
-    signal_set
+    signal_set \
     ex_scan \
     in_scan \
     scan_in_place
