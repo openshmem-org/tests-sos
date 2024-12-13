@@ -69,7 +69,8 @@ int main(void)
     }
     
     for (int i = 0; i < NELEM; i++) {
-        expected[i] = ((me + i) * ((me + 1 + i)) / 2 - (i * (i - 1)) / 2) - (me+i);
+        expected[i] = ((me + i) * ((me + 1 + i)) / 2 - (i * (i - 1)) / 2) - (me + i);
+
     }
     
     shmem_barrier_all();
