@@ -631,7 +631,7 @@ int check_hostname_validation(const perf_metrics_t * const my_info) {
 
     int hostname_status = -1;
 
-    int hostname_size = MAX_HOSTNAME_LEN;
+    int hostname_size = MAX_HOSTNAME_LEN + 1;
     int i, errors = 0;
 
     char *hostname = (char *) shmem_malloc (hostname_size * sizeof(char));
@@ -648,6 +648,9 @@ int check_hostname_validation(const perf_metrics_t * const my_info) {
         fprintf(stderr, "gethostname failed (%d)\n", hostname_status);
         return -1;
     }
+
+    hostname[MAX_HOSTNAME_LEN] = '\0';
+
     shmem_barrier_all();
 
     shmem_char_fcollect(SHMEM_TEAM_WORLD, dest, hostname, hostname_size);
