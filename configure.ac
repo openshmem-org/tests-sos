@@ -37,20 +37,20 @@ AC_PROG_CXX([oshc++]) dnl required even with --disable-cxx due to automake condi
 
 dnl information on the package
 AC_ARG_ENABLE([picky],
-    [AC_HELP_STRING([--enable-picky],
+    [AS_HELP_STRING([--enable-picky],
                     [Enable developer-level compiler pickyness when building (default: disabled)])])
 
 AC_ARG_ENABLE([debug],
-    [AC_HELP_STRING([--enable-debug],
-                    [Include debugging symbols (default: disabled)])])
+    [AS_HELP_STRING([--enable-debug],
+                    [Include debugging symbols in the build (default: disabled)])])
 
 AC_ARG_ENABLE([deprecated-tests],
-    [AC_HELP_STRING([--enable-deprecated-tests],
+    [AS_HELP_STRING([--enable-deprecated-tests],
                     [Enable deprecated SHMEM API calls in tests (default:disabled)])])
 AM_CONDITIONAL([ENABLE_DEPRECATED_TESTS], [test "$enable_deprecated_tests" = "yes"])
 
 AC_ARG_WITH([test-runner],
-    [AC_HELP_STRING([--with-test-runner],
+    [AS_HELP_STRING([--with-test-runner],
                     [Command used to run tests (default: 'oshrun -np $(NPROCS)')])])
 
 if test -n "$with_test_runner" ; then
@@ -61,7 +61,7 @@ fi
 AC_SUBST(TEST_RUNNER)
 
 AC_ARG_ENABLE([threads],
-    [AC_HELP_STRING([--disable-threads],
+    [AS_HELP_STRING([--disable-threads],
                     [Disable multithreaded tests (default:enabled)])])
 
 AS_IF([test "$enable_threads" != "no"], [
@@ -86,28 +86,28 @@ AS_IF([test "$enable_threads" != "no"], [
 AM_CONDITIONAL([HAVE_OPENMP], [test "$enable_threads" != "no" -a "$enable_openmp" != "no" -a "$ac_cv_prog_c_openmp" != "unsupported"])
 
 AC_ARG_ENABLE([lengthy-tests],
-    [AC_HELP_STRING([--enable-lengthy-tests],
+    [AS_HELP_STRING([--enable-lengthy-tests],
                     [Execute long running tests as part of "make check" (default: disabled)])])
 AM_CONDITIONAL([ENABLE_LENGTHY_TESTS], [test "$enable_lengthy_tests" = "yes"])
 
 AC_ARG_ENABLE([fortran],
-    [AC_HELP_STRING([--enable-fortran],
-                    [Disable Fortran tests (default: disabled)])])
+    [AS_HELP_STRING([--enable-fortran],
+                    [Enable building the Fortran tests (default: disabled)])])
 
 AC_ARG_ENABLE([cxx],
-    [AC_HELP_STRING([--disable-cxx],
+    [AS_HELP_STRING([--disable-cxx],
                     [Disable C++ tests (default: enabled)])])
 
 AC_ARG_ENABLE([c11-checks],
-    [AC_HELP_STRING([--disable-c11-checks],
+    [AS_HELP_STRING([--disable-c11-checks],
                     [Disable build-time type checks for C11 bindings (default: enabled)])])
 
 AC_ARG_ENABLE([profiling],
-    [AC_HELP_STRING([--enable-profiling],
+    [AS_HELP_STRING([--enable-profiling],
                     [Enable profiling (pshmem) interface tests (default:disabled)])])
 
 AC_ARG_ENABLE([shmemx],
-    [AC_HELP_STRING([--enable-shmemx],
+    [AS_HELP_STRING([--enable-shmemx],
                     [Enable SHMEM extensions tests (default:disabled)])])
 AM_CONDITIONAL([SHMEMX_TESTS], [test "$enable_shmemx" = "yes"])
 
@@ -154,7 +154,9 @@ if test "$enable_c11_checks" != "no" ; then
     AS_IF([test "$shmem_cv_c11_works" = "no"],
           [AC_MSG_RESULT([no])
           CFLAGS="$ORIG_CFLAGS"
-          AC_PROG_CC_C99
+          # AC_PROG_CC_C99 is obsolete after autoconf 2.70, because
+          # AC_PROG_CC should revert to C99 automatically if needed
+          m4_version_prereq([2.70], [AC_PROG_CC], [AC_PROG_CC_C99])
           ],
           [AC_MSG_RESULT([yes])
           CFLAGS="-std=gnu11 $ORIG_CFLAGS"]
