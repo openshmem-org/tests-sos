@@ -123,7 +123,8 @@ check_PROGRAMS = \
 	shmem_team_negative_stride \
 	shmem_ctx_get_team \
 	atomic_nbi \
-	fadd_nbi
+	fadd_nbi \
+	shmem_txlb
 
 # Temporarily disabled: Global exit test tends to fail with MPI-PMI
 if !USE_PMI_MPI
