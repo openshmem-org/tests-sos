@@ -8,6 +8,7 @@
 # distribution.
 
 check_PROGRAMS = \
+	shmem_barrier_perf \
 	shmem_latency_put_perf \
 	shmem_latency_put_perf_nb \
 	shmem_latency_get_perf \
