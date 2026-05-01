@@ -55,6 +55,7 @@ check_PROGRAMS = \
 	test_lock_cswap \
 	fcollect64 \
 	bigput \
+	bigput_sweep \
 	bigget \
 	ns \
 	bcast_flood \
