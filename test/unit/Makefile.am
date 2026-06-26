@@ -55,6 +55,8 @@ check_PROGRAMS = \
 	test_lock_cswap \
 	fcollect64 \
 	bigput \
+	hierarchical_barrier \
+	hier_barrier_sense \
 	bigget \
 	ns \
 	bcast_flood \
