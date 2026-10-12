@@ -59,11 +59,14 @@ int main(void)
     shmem_init();
     int me = shmem_my_pe();
 
-    long *dest = shmem_malloc(NELEMS * sizeof(long));
-    long *src = shmem_malloc(NELEMS * sizeof(long));
+    /* collect, fcollect, alltoall and alltoalls move NELEMS elements to or from every PE,
+     * so both buffers must hold NELEMS * n_pes elements. */
+    int npes = shmem_n_pes();
+    long *dest = shmem_malloc(NELEMS * npes * sizeof(long));
+    long *src = shmem_malloc(NELEMS * npes * sizeof(long));
 
     size_t i;
-    for (i = 0; i < NELEMS; i++) {
+    for (i = 0; i < (size_t) NELEMS * npes; i++) {
         src[i] = me;
     }
 
