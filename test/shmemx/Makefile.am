@@ -29,7 +29,8 @@ check_PROGRAMS += \
     signal_set \
     ex_scan \
     in_scan \
-    scan_in_place
+    scan_in_place \
+    query_initialized
 
 if HAVE_PTHREADS
 check_PROGRAMS += \
